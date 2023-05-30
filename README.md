@@ -34,3 +34,4 @@ Please report any issues related to this library in the [swift-openapi-generator
 ## Documentation
 
 To learn more, check out the full [documentation](https://swiftpackageindex.com/swift-server/swift-openapi-async-http-client/documentation).
+

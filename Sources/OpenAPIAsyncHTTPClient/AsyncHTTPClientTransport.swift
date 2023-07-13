@@ -115,7 +115,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     public var configuration: Configuration
 
     /// Underlying request sender for the transport.
-    internal let requestSender: HTTPRequestSending
+    internal let requestSender: any HTTPRequestSending
 
     /// Creates a new transport.
     /// - Parameters:
@@ -123,7 +123,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     ///   - requestSender: The underlying request sender.
     internal init(
         configuration: Configuration,
-        requestSender: HTTPRequestSending
+        requestSender: any HTTPRequestSending
     ) {
         self.configuration = configuration
         self.requestSender = requestSender

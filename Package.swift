@@ -15,13 +15,6 @@
 import Foundation
 import PackageDescription
 
-// General Swift-settings for all targets.
-let swiftSettings: [SwiftSetting] = [
-    // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
-    // Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny")
-]
-
 let package = Package(
     name: "swift-openapi-async-http-client",
     platforms: [
@@ -46,15 +39,13 @@ let package = Package(
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
-            ],
-            swiftSettings: swiftSettings
+            ]
         ),
         .testTarget(
             name: "OpenAPIAsyncHTTPClientTests",
             dependencies: [
                 "OpenAPIAsyncHTTPClient",
-            ],
-            swiftSettings: swiftSettings
+            ]
         ),
     ]
 )

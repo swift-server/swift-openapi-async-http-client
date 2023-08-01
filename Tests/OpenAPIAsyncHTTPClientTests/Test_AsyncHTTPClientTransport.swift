@@ -63,7 +63,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
     }
 
     func testConvertResponse() async throws {
-        let httpResponse: HTTPClientResponse = .init(
+        let httpResponse = HTTPClientResponse(
             status: .ok,
             headers: [
                 "content-type": "application/json"
@@ -83,7 +83,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
 
     func testSend() async throws {
         let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        let httpClient: HTTPClient = .init(
+        let httpClient = HTTPClient(
             eventLoopGroupProvider: .shared(eventLoopGroup),
             configuration: .init()
         )

@@ -30,23 +30,9 @@ import protocol Foundation.LocalizedError
 ///
 /// ### Use the AsyncHTTPClient transport
 ///
-/// Create the underlying HTTP client:
+/// Instantiate the transport:
 ///
-///     let httpClient = HTTPClient(eventLoopGroupProvider: .createNew)
-///
-/// Either store a reference to the client elsewhere and shut it down during
-/// cleanup, or add a defer block if the client is only used in the current
-/// scope:
-///
-///     defer {
-///         try! httpClient.syncShutdown()
-///     }
-///
-/// Instantiate the transport and provide the HTTP client to it:
-///
-///     let transport = AsyncHTTPClientTransport(
-///         configuration: .init(client: httpClient)
-///     )
+///     let transport = AsyncHTTPClientTransport()
 ///
 /// Create the base URL of the server to call using your client. If the server
 /// URL was defined in the OpenAPI document, you find a generated method for it
@@ -68,6 +54,12 @@ import protocol Foundation.LocalizedError
 ///
 ///     let response = try await client.checkHealth(.init())
 ///     // ...
+///
+/// ### Provide a custom Client
+///
+/// The ``AsyncHTTPClientTransport/Configuration-swift.struct`` type allows you
+/// to provide a custom `HTTPClient` and tweak behaviors such as the default
+/// timeout.
 public struct AsyncHTTPClientTransport: ClientTransport {
 
     /// A set of configuration values for the AsyncHTTPClient transport.
@@ -83,7 +75,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         /// - Parameters:
         ///   - client: The underlying client used to perform HTTP operations.
         ///   - timeout: The request timeout, defaults to 1 minute.
-        public init(client: HTTPClient, timeout: TimeAmount = .minutes(1)) {
+        public init(client: HTTPClient = .init(), timeout: TimeAmount = .minutes(1)) {
             self.client = client
             self.timeout = timeout
         }

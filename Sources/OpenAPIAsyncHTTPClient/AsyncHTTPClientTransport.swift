@@ -161,7 +161,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         guard var baseUrlComponents = URLComponents(string: baseURL.absoluteString) else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)
         }
-        baseUrlComponents.path += request.path
+        baseUrlComponents.percentEncodedPath += request.path
         baseUrlComponents.percentEncodedQuery = request.query
         guard let url = baseUrlComponents.url else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)

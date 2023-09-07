@@ -38,7 +38,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
 
     func testConvertRequest() throws {
         let request: OpenAPIRuntime.Request = .init(
-            path: "/hello/Maria",
+            path: "/hello%20world/Maria",
             query: "greeting=Howdy",
             method: .post,
             headerFields: [
@@ -50,7 +50,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             request,
             baseURL: try XCTUnwrap(URL(string: "http://example.com/api/v1"))
         )
-        XCTAssertEqual(httpRequest.url, "http://example.com/api/v1/hello/Maria?greeting=Howdy")
+        XCTAssertEqual(httpRequest.url, "http://example.com/api/v1/hello%20world/Maria?greeting=Howdy")
         XCTAssertEqual(httpRequest.method, .POST)
         XCTAssertEqual(
             httpRequest.headers,

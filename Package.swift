@@ -42,6 +42,7 @@ let package = Package(
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.19.0"),
         .package(url: "https://github.com/apple/swift-openapi-runtime", "0.1.3" ..< "0.3.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
+//        .package(url: "https://github.com/guoye-zhang/swift-nio-extras", branch: "http-types"),
     ],
     targets: [
         .target(
@@ -50,6 +51,8 @@ let package = Package(
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
+//                .product(name: "NIOHTTPTypes", package: "swift-nio-extras"),
+//                .product(name: "NIOHTTPTypesHTTP1", package: "swift-nio-extras"),
             ],
             swiftSettings: swiftSettings
         ),

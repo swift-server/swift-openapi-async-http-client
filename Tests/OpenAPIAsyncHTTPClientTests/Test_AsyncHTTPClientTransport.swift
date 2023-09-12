@@ -79,7 +79,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
                 .contentType: "application/json"
             ]
         )
-        let bufferedResponseBody = try await responseBody.collectAsData(upTo: .max)
+        let bufferedResponseBody = try await Data(collecting: responseBody, upTo: .max)
         XCTAssertEqual(bufferedResponseBody, try Self.testData)
     }
 
@@ -105,7 +105,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             baseURL: Self.testUrl,
             operationID: "sayHello"
         )
-        let bufferedResponseBody = try await responseBody.collectAsString(upTo: .max)
+        let bufferedResponseBody = try await String(collecting: responseBody, upTo: .max)
         XCTAssertEqual(bufferedResponseBody, "[{}]")
         XCTAssertEqual(response.status.code, 200)
     }

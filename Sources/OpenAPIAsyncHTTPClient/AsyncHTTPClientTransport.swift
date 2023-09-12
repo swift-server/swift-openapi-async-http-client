@@ -210,7 +210,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         }
 
         let body = HTTPBody(
-            sequence: httpResponse.body.map { HTTPBody.ByteChunk($0.readableBytesView) },
+            httpResponse.body.map { $0.readableBytesView },
             length: length,
             iterationBehavior: .single
         )

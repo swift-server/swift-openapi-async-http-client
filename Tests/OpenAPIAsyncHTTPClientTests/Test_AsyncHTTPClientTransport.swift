@@ -71,7 +71,11 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             ],
             body: .bytes(Self.testBuffer)
         )
-        let (response, responseBody) = try await AsyncHTTPClientTransport.convertResponse(httpResponse)
+        let (response, maybeResponseBody) = try await AsyncHTTPClientTransport.convertResponse(
+            method: .get,
+            httpResponse: httpResponse
+        )
+        let responseBody = try XCTUnwrap(maybeResponseBody)
         XCTAssertEqual(response.status.code, 200)
         XCTAssertEqual(
             response.headerFields,
@@ -99,12 +103,13 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
                 .init("x-request")!: "yes"
             ]
         )
-        let (response, responseBody) = try await transport.send(
+        let (response, maybeResponseBody) = try await transport.send(
             request,
             body: nil,
             baseURL: Self.testUrl,
             operationID: "sayHello"
         )
+        let responseBody = try XCTUnwrap(maybeResponseBody)
         let bufferedResponseBody = try await String(collecting: responseBody, upTo: .max)
         XCTAssertEqual(bufferedResponseBody, "[{}]")
         XCTAssertEqual(response.status.code, 200)

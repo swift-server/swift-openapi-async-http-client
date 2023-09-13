@@ -146,10 +146,13 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         body: HTTPBody?,
         baseURL: URL,
         operationID: String
-    ) async throws -> (HTTPResponse, HTTPBody) {
+    ) async throws -> (HTTPResponse, HTTPBody?) {
         let httpRequest = try Self.convertRequest(request, body: body, baseURL: baseURL)
         let httpResponse = try await invokeSession(with: httpRequest)
-        let response = try await Self.convertResponse(httpResponse)
+        let response = try await Self.convertResponse(
+            method: request.method,
+            httpResponse: httpResponse
+        )
         return response
     }
 
@@ -192,8 +195,9 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
     /// Converts the received URLResponse into the shared Response.
     internal static func convertResponse(
-        _ httpResponse: HTTPClientResponse
-    ) async throws -> (HTTPResponse, HTTPBody) {
+        method: HTTPRequest.Method,
+        httpResponse: HTTPClientResponse
+    ) async throws -> (HTTPResponse, HTTPBody?) {
 
         var headerFields: HTTPFields = [:]
         for header in httpResponse.headers {
@@ -209,11 +213,18 @@ public struct AsyncHTTPClientTransport: ClientTransport {
             length = .unknown
         }
 
-        let body = HTTPBody(
-            httpResponse.body.map { $0.readableBytesView },
-            length: length,
-            iterationBehavior: .single
-        )
+        let body: HTTPBody?
+        switch method {
+        case .head, .connect, .trace:
+            body = nil
+        default:
+            body = HTTPBody(
+                httpResponse.body.map { $0.readableBytesView },
+                length: length,
+                iterationBehavior: .single
+            )
+        }
+
         let response = HTTPResponse(
             status: .init(code: Int(httpResponse.status.code)),
             headerFields: headerFields

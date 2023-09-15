@@ -32,7 +32,13 @@ import protocol Foundation.LocalizedError
 ///
 /// Instantiate the transport:
 ///
-///     let transport = AsyncHTTPClientTransport()
+///     let httpClient = HTTPClient()
+///     defer {
+///         try! httpClient.syncShutdown()
+///     }
+///     let transport = AsyncHTTPClientTransport(
+///         configuration: .init(client: httpClient)
+///     )
 ///
 /// Create the base URL of the server to call using your client. If the server
 /// URL was defined in the OpenAPI document, you find a generated method for it
@@ -75,7 +81,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         /// - Parameters:
         ///   - client: The underlying client used to perform HTTP operations.
         ///   - timeout: The request timeout, defaults to 1 minute.
-        public init(client: HTTPClient = .init(), timeout: TimeAmount = .minutes(1)) {
+        public init(client: HTTPClient, timeout: TimeAmount = .minutes(1)) {
             self.client = client
             self.timeout = timeout
         }

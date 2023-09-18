@@ -88,12 +88,8 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
     }
 
     func testSend() async throws {
-        let httpClient = HTTPClient()
-        defer {
-            try! httpClient.syncShutdown()
-        }
         let transport = AsyncHTTPClientTransport(
-            configuration: .init(client: httpClient),
+            configuration: .init(),
             requestSender: TestSender.test
         )
         let request: HTTPRequest = .init(

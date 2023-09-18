@@ -85,7 +85,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         ///     Provide nil to use the shared internal client.
         ///   - timeout: The request timeout, defaults to 1 minute.
         public init(client: HTTPClient? = nil, timeout: TimeAmount = .minutes(1)) {
-            self.client = Self.sharedClient
+            self.client = client ?? Self.sharedClient
             self.timeout = timeout
         }
     }

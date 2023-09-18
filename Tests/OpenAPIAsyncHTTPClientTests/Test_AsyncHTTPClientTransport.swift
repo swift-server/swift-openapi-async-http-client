@@ -82,16 +82,8 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
     }
 
     func testSend() async throws {
-        let eventLoopGroup = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        let httpClient = HTTPClient(
-            eventLoopGroupProvider: .shared(eventLoopGroup),
-            configuration: .init()
-        )
-        defer {
-            try! httpClient.syncShutdown()
-        }
         let transport = AsyncHTTPClientTransport(
-            configuration: .init(client: httpClient),
+            configuration: .init(),
             requestSender: TestSender.test
         )
         let request: OpenAPIRuntime.Request = .init(

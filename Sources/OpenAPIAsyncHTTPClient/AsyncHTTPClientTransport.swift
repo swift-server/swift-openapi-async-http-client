@@ -74,7 +74,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         /// in AsyncHTTPClient. Do not use this value directly, outside of
         /// the `Configuration.init(client:timeout:)` initializer, as it will
         /// likely be removed in the future.
-        public static let sharedClient: HTTPClient = .init()
+        private static let sharedClient: HTTPClient = .init()
 
         /// The default request timeout.
         public var timeout: TimeAmount
@@ -82,9 +82,10 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         /// Creates a new configuration with the specified client and timeout.
         /// - Parameters:
         ///   - client: The underlying client used to perform HTTP operations.
+        ///     Provide nil to use the shared internal client.
         ///   - timeout: The request timeout, defaults to 1 minute.
-        public init(client: HTTPClient = Self.sharedClient, timeout: TimeAmount = .minutes(1)) {
-            self.client = client
+        public init(client: HTTPClient? = nil, timeout: TimeAmount = .minutes(1)) {
+            self.client = Self.sharedClient
             self.timeout = timeout
         }
     }

@@ -45,7 +45,7 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
                 .contentType: "application/json"
             ]
         )
-        let requestBody = try HTTPBody(data: Self.testData)
+        let requestBody = try HTTPBody(Self.testData)
         let httpRequest = try AsyncHTTPClientTransport.convertRequest(
             request,
             body: requestBody,

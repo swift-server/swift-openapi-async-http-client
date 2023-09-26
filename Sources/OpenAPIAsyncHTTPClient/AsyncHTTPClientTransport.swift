@@ -173,11 +173,14 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         body: HTTPBody?,
         baseURL: URL
     ) throws -> HTTPClientRequest {
-        guard var baseUrlComponents = URLComponents(string: baseURL.absoluteString) else {
+        guard
+            var baseUrlComponents = URLComponents(string: baseURL.absoluteString),
+            let requestUrlComponents = URLComponents(string: request.path ?? "")
+        else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)
         }
-        baseUrlComponents.percentEncodedPath += request.soar_pathOnly
-        baseUrlComponents.percentEncodedQuery = request.soar_query.map(String.init)
+        baseUrlComponents.percentEncodedPath += requestUrlComponents.percentEncodedPath
+        baseUrlComponents.percentEncodedQuery = requestUrlComponents.percentEncodedQuery
         guard let url = baseUrlComponents.url else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)
         }

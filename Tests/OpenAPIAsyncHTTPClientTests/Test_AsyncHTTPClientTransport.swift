@@ -39,8 +39,10 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
 
     func testConvertRequest() throws {
         let request: HTTPRequest = .init(
-            soar_path: "/hello%20world/Maria?greeting=Howdy",
             method: .post,
+            scheme: nil,
+            authority: nil,
+            path: "/hello%20world/Maria?greeting=Howdy",
             headerFields: [
                 .contentType: "application/json"
             ]
@@ -93,8 +95,10 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             requestSender: TestSender.test
         )
         let request: HTTPRequest = .init(
-            soar_path: "/api/v1/hello/Maria",
             method: .get,
+            scheme: nil,
+            authority: nil,
+            path: "/api/v1/hello/Maria",
             headerFields: [
                 .init("x-request")!: "yes"
             ]

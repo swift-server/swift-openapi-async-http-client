@@ -16,6 +16,7 @@ import AsyncHTTPClient
 import NIOCore
 import NIOHTTP1
 import NIOFoundationCompat
+import HTTPTypes
 #if canImport(Darwin)
 import Foundation
 #else
@@ -100,7 +101,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     internal enum Error: Swift.Error, CustomStringConvertible, LocalizedError {
 
         /// Invalid URL composed from base URL and received request.
-        case invalidRequestURL(request: OpenAPIRuntime.Request, baseURL: URL)
+        case invalidRequestURL(request: HTTPRequest, baseURL: URL)
 
         // MARK: CustomStringConvertible
 
@@ -108,7 +109,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
             switch self {
             case let .invalidRequestURL(request: request, baseURL: baseURL):
                 return
-                    "Invalid request URL from request path: \(request.path), query: \(request.query ?? "<nil>") relative to base URL: \(baseURL.absoluteString)"
+                    "Invalid request URL from request path: \(request.path ?? "<nil>") relative to base URL: \(baseURL.absoluteString)"
             }
         }
 
@@ -150,13 +151,17 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     // MARK: ClientTransport
 
     public func send(
-        _ request: OpenAPIRuntime.Request,
+        _ request: HTTPRequest,
+        body: HTTPBody?,
         baseURL: URL,
         operationID: String
-    ) async throws -> OpenAPIRuntime.Response {
-        let httpRequest = try Self.convertRequest(request, baseURL: baseURL)
+    ) async throws -> (HTTPResponse, HTTPBody?) {
+        let httpRequest = try Self.convertRequest(request, body: body, baseURL: baseURL)
         let httpResponse = try await invokeSession(with: httpRequest)
-        let response = try await Self.convertResponse(httpResponse)
+        let response = try await Self.convertResponse(
+            method: request.method,
+            httpResponse: httpResponse
+        )
         return response
     }
 
@@ -164,43 +169,79 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
     /// Converts the shared Request type into URLRequest.
     internal static func convertRequest(
-        _ request: OpenAPIRuntime.Request,
+        _ request: HTTPRequest,
+        body: HTTPBody?,
         baseURL: URL
     ) throws -> HTTPClientRequest {
-        guard var baseUrlComponents = URLComponents(string: baseURL.absoluteString) else {
+        guard
+            var baseUrlComponents = URLComponents(string: baseURL.absoluteString),
+            let requestUrlComponents = URLComponents(string: request.path ?? "")
+        else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)
         }
-        baseUrlComponents.percentEncodedPath += request.path
-        baseUrlComponents.percentEncodedQuery = request.query
+        baseUrlComponents.percentEncodedPath += requestUrlComponents.percentEncodedPath
+        baseUrlComponents.percentEncodedQuery = requestUrlComponents.percentEncodedQuery
         guard let url = baseUrlComponents.url else {
             throw Error.invalidRequestURL(request: request, baseURL: baseURL)
         }
         var clientRequest = HTTPClientRequest(url: url.absoluteString)
         clientRequest.method = request.method.asHTTPMethod
         for header in request.headerFields {
-            clientRequest.headers.add(name: header.name.lowercased(), value: header.value)
+            clientRequest.headers.add(name: header.name.canonicalName, value: header.value)
         }
-        if let body = request.body {
-            clientRequest.body = .bytes(body)
+        if let body {
+            let length: HTTPClientRequest.Body.Length
+            switch body.length {
+            case .unknown:
+                length = .unknown
+            case .known(let count):
+                length = .known(count)
+            }
+            clientRequest.body = .stream(
+                body.map { .init(bytes: $0) },
+                length: length
+            )
         }
         return clientRequest
     }
 
     /// Converts the received URLResponse into the shared Response.
     internal static func convertResponse(
-        _ httpResponse: HTTPClientResponse
-    ) async throws -> OpenAPIRuntime.Response {
-        let headerFields: [OpenAPIRuntime.HeaderField] = httpResponse
-            .headers
-            .map { .init(name: $0, value: $1) }
-        let body = try await httpResponse.body.collect(upTo: .max)
-        let bodyData = Data(buffer: body, byteTransferStrategy: .noCopy)
-        let response = OpenAPIRuntime.Response(
-            statusCode: Int(httpResponse.status.code),
-            headerFields: headerFields,
-            body: bodyData
+        method: HTTPRequest.Method,
+        httpResponse: HTTPClientResponse
+    ) async throws -> (HTTPResponse, HTTPBody?) {
+
+        var headerFields: HTTPFields = [:]
+        for header in httpResponse.headers {
+            headerFields[.init(header.name)!] = header.value
+        }
+
+        let length: HTTPBody.Length
+        if let lengthHeaderString = headerFields[.contentLength],
+            let lengthHeader = Int(lengthHeaderString)
+        {
+            length = .known(lengthHeader)
+        } else {
+            length = .unknown
+        }
+
+        let body: HTTPBody?
+        switch method {
+        case .head, .connect, .trace:
+            body = nil
+        default:
+            body = HTTPBody(
+                httpResponse.body.map { $0.readableBytesView },
+                length: length,
+                iterationBehavior: .single
+            )
+        }
+
+        let response = HTTPResponse(
+            status: .init(code: Int(httpResponse.status.code)),
+            headerFields: headerFields
         )
-        return response
+        return (response, body)
     }
 
     // MARK: Private
@@ -215,7 +256,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     }
 }
 
-extension OpenAPIRuntime.HTTPMethod {
+extension HTTPTypes.HTTPRequest.Method {
     var asHTTPMethod: NIOHTTP1.HTTPMethod {
         switch self {
         case .get:

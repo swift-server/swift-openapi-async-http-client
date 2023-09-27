@@ -16,7 +16,7 @@ Add the package dependency in your `Package.swift`:
 ```swift
 .package(
     url: "https://github.com/swift-server/swift-openapi-async-http-client", 
-    .upToNextMinor(from: "0.2.0")
+    .upToNextMinor(from: "0.3.0")
 ),
 ```
 

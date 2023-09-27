@@ -17,6 +17,7 @@ import NIOCore
 import NIOPosix
 import AsyncHTTPClient
 @testable import OpenAPIAsyncHTTPClient
+import HTTPTypes
 
 class Test_AsyncHTTPClientTransport: XCTestCase {
 
@@ -37,17 +38,19 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
     }
 
     func testConvertRequest() throws {
-        let request: OpenAPIRuntime.Request = .init(
-            path: "/hello%20world/Maria",
-            query: "greeting=Howdy",
+        let request: HTTPRequest = .init(
             method: .post,
+            scheme: nil,
+            authority: nil,
+            path: "/hello%20world/Maria?greeting=Howdy",
             headerFields: [
-                .init(name: "content-type", value: "application/json")
-            ],
-            body: try Self.testData
+                .contentType: "application/json"
+            ]
         )
+        let requestBody = try HTTPBody(Self.testData)
         let httpRequest = try AsyncHTTPClientTransport.convertRequest(
             request,
+            body: requestBody,
             baseURL: try XCTUnwrap(URL(string: "http://example.com/api/v1"))
         )
         XCTAssertEqual(httpRequest.url, "http://example.com/api/v1/hello%20world/Maria?greeting=Howdy")
@@ -70,15 +73,20 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             ],
             body: .bytes(Self.testBuffer)
         )
-        let response = try await AsyncHTTPClientTransport.convertResponse(httpResponse)
-        XCTAssertEqual(response.statusCode, 200)
+        let (response, maybeResponseBody) = try await AsyncHTTPClientTransport.convertResponse(
+            method: .get,
+            httpResponse: httpResponse
+        )
+        let responseBody = try XCTUnwrap(maybeResponseBody)
+        XCTAssertEqual(response.status.code, 200)
         XCTAssertEqual(
             response.headerFields,
             [
-                .init(name: "content-type", value: "application/json")
+                .contentType: "application/json"
             ]
         )
-        XCTAssertEqual(response.body, try Self.testData)
+        let bufferedResponseBody = try await Data(collecting: responseBody, upTo: .max)
+        XCTAssertEqual(bufferedResponseBody, try Self.testData)
     }
 
     func testSend() async throws {
@@ -86,19 +94,25 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
             configuration: .init(),
             requestSender: TestSender.test
         )
-        let request: OpenAPIRuntime.Request = .init(
-            path: "/api/v1/hello/Maria",
+        let request: HTTPRequest = .init(
             method: .get,
+            scheme: nil,
+            authority: nil,
+            path: "/api/v1/hello/Maria",
             headerFields: [
-                .init(name: "x-request", value: "yes")
+                .init("x-request")!: "yes"
             ]
         )
-        let response = try await transport.send(
+        let (response, maybeResponseBody) = try await transport.send(
             request,
+            body: nil,
             baseURL: Self.testUrl,
             operationID: "sayHello"
         )
-        XCTAssertEqual(response.statusCode, 200)
+        let responseBody = try XCTUnwrap(maybeResponseBody)
+        let bufferedResponseBody = try await String(collecting: responseBody, upTo: .max)
+        XCTAssertEqual(bufferedResponseBody, "[{}]")
+        XCTAssertEqual(response.status.code, 200)
     }
 }
 

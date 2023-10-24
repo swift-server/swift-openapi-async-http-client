@@ -139,8 +139,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     }
 
     /// Creates a new transport.
-    /// - Parameters:
-    ///   - configuration: A set of configuration values used by the transport.
+    /// - Parameter configuration: A set of configuration values used by the transport.
     public init(configuration: Configuration) {
         self.init(
             configuration: configuration,
@@ -150,6 +149,16 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
     // MARK: ClientTransport
 
+    /// Sends an HTTP request and returns the corresponding HTTP response.
+    ///
+    /// - Parameters:
+    ///   - request: The HTTP request to send.
+    ///   - body: The HTTP body to include in the request (optional).
+    ///   - baseURL: The base URL for the request.
+    ///   - operationID: The identifier for the operation.
+    ///
+    /// - Returns: A tuple containing the HTTP response and an optional HTTP body in the response.
+    /// - Throws: An error if the request or response handling encounters any issues.
     public func send(
         _ request: HTTPRequest,
         body: HTTPBody?,

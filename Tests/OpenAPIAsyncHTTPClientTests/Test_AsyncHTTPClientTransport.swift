@@ -118,8 +118,8 @@ class Test_AsyncHTTPClientTransport: XCTestCase {
 
 struct TestSender: HTTPRequestSending {
     var sendClosure:
-        @Sendable (AsyncHTTPClientTransport.Request, HTTPClient, TimeAmount) async throws -> AsyncHTTPClientTransport
-            .Response
+        @Sendable (AsyncHTTPClientTransport.Request, HTTPClient, TimeAmount) async throws ->
+            AsyncHTTPClientTransport.Response
     func send(
         request: AsyncHTTPClientTransport.Request,
         with client: HTTPClient,

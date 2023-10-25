@@ -30,7 +30,7 @@ done
 
 SWIFTFORMAT_BIN=${SWIFTFORMAT_BIN:-$(command -v swift-format)} || fatal "❌ SWIFTFORMAT_BIN unset and no swift-format on PATH"
 
-"${SWIFTFORMAT_BIN}" "$FORMAT_COMMAND" \
+"${SWIFTFORMAT_BIN}" "${FORMAT_COMMAND[@]}" \
   --parallel --recursive \
   "${REPO_ROOT}/Sources" "${REPO_ROOT}/Tests" \
   && SWIFT_FORMAT_RC=$? || SWIFT_FORMAT_RC=$?

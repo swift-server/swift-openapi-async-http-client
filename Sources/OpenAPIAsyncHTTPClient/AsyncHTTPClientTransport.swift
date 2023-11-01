@@ -115,9 +115,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
         // MARK: LocalizedError
 
-        var errorDescription: String? {
-            description
-        }
+        var errorDescription: String? { description }
     }
 
     /// A set of configuration values used by the transport.
@@ -130,10 +128,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     /// - Parameters:
     ///   - configuration: A set of configuration values used by the transport.
     ///   - requestSender: The underlying request sender.
-    internal init(
-        configuration: Configuration,
-        requestSender: any HTTPRequestSending
-    ) {
+    internal init(configuration: Configuration, requestSender: any HTTPRequestSending) {
         self.configuration = configuration
         self.requestSender = requestSender
     }
@@ -141,10 +136,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     /// Creates a new transport.
     /// - Parameter configuration: A set of configuration values used by the transport.
     public init(configuration: Configuration) {
-        self.init(
-            configuration: configuration,
-            requestSender: AsyncHTTPRequestSender()
-        )
+        self.init(configuration: configuration, requestSender: AsyncHTTPRequestSender())
     }
 
     // MARK: ClientTransport
@@ -159,40 +151,27 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     ///
     /// - Returns: A tuple containing the HTTP response and an optional HTTP body in the response.
     /// - Throws: An error if the request or response handling encounters any issues.
-    public func send(
-        _ request: HTTPRequest,
-        body: HTTPBody?,
-        baseURL: URL,
-        operationID: String
-    ) async throws -> (HTTPResponse, HTTPBody?) {
+    public func send(_ request: HTTPRequest, body: HTTPBody?, baseURL: URL, operationID: String) async throws -> (
+        HTTPResponse, HTTPBody?
+    ) {
         let httpRequest = try Self.convertRequest(request, body: body, baseURL: baseURL)
         let httpResponse = try await invokeSession(with: httpRequest)
-        let response = try await Self.convertResponse(
-            method: request.method,
-            httpResponse: httpResponse
-        )
+        let response = try await Self.convertResponse(method: request.method, httpResponse: httpResponse)
         return response
     }
 
     // MARK: Internal
 
     /// Converts the shared Request type into URLRequest.
-    internal static func convertRequest(
-        _ request: HTTPRequest,
-        body: HTTPBody?,
-        baseURL: URL
-    ) throws -> HTTPClientRequest {
-        guard
-            var baseUrlComponents = URLComponents(string: baseURL.absoluteString),
+    internal static func convertRequest(_ request: HTTPRequest, body: HTTPBody?, baseURL: URL) throws
+        -> HTTPClientRequest
+    {
+        guard var baseUrlComponents = URLComponents(string: baseURL.absoluteString),
             let requestUrlComponents = URLComponents(string: request.path ?? "")
-        else {
-            throw Error.invalidRequestURL(request: request, baseURL: baseURL)
-        }
+        else { throw Error.invalidRequestURL(request: request, baseURL: baseURL) }
         baseUrlComponents.percentEncodedPath += requestUrlComponents.percentEncodedPath
         baseUrlComponents.percentEncodedQuery = requestUrlComponents.percentEncodedQuery
-        guard let url = baseUrlComponents.url else {
-            throw Error.invalidRequestURL(request: request, baseURL: baseURL)
-        }
+        guard let url = baseUrlComponents.url else { throw Error.invalidRequestURL(request: request, baseURL: baseURL) }
         var clientRequest = HTTPClientRequest(url: url.absoluteString)
         clientRequest.method = request.method.asHTTPMethod
         for header in request.headerFields {
@@ -201,34 +180,24 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         if let body {
             let length: HTTPClientRequest.Body.Length
             switch body.length {
-            case .unknown:
-                length = .unknown
-            case .known(let count):
-                length = .known(count)
+            case .unknown: length = .unknown
+            case .known(let count): length = .known(count)
             }
-            clientRequest.body = .stream(
-                body.map { .init(bytes: $0) },
-                length: length
-            )
+            clientRequest.body = .stream(body.map { .init(bytes: $0) }, length: length)
         }
         return clientRequest
     }
 
     /// Converts the received URLResponse into the shared Response.
-    internal static func convertResponse(
-        method: HTTPRequest.Method,
-        httpResponse: HTTPClientResponse
-    ) async throws -> (HTTPResponse, HTTPBody?) {
+    internal static func convertResponse(method: HTTPRequest.Method, httpResponse: HTTPClientResponse) async throws -> (
+        HTTPResponse, HTTPBody?
+    ) {
 
         var headerFields: HTTPFields = [:]
-        for header in httpResponse.headers {
-            headerFields[.init(header.name)!] = header.value
-        }
+        for header in httpResponse.headers { headerFields[.init(header.name)!] = header.value }
 
         let length: HTTPBody.Length
-        if let lengthHeaderString = headerFields[.contentLength],
-            let lengthHeader = Int(lengthHeaderString)
-        {
+        if let lengthHeaderString = headerFields[.contentLength], let lengthHeader = Int(lengthHeaderString) {
             length = .known(lengthHeader)
         } else {
             length = .unknown
@@ -236,20 +205,12 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
         let body: HTTPBody?
         switch method {
-        case .head, .connect, .trace:
-            body = nil
+        case .head, .connect, .trace: body = nil
         default:
-            body = HTTPBody(
-                httpResponse.body.map { $0.readableBytesView },
-                length: length,
-                iterationBehavior: .single
-            )
+            body = HTTPBody(httpResponse.body.map { $0.readableBytesView }, length: length, iterationBehavior: .single)
         }
 
-        let response = HTTPResponse(
-            status: .init(code: Int(httpResponse.status.code)),
-            headerFields: headerFields
-        )
+        let response = HTTPResponse(status: .init(code: Int(httpResponse.status.code)), headerFields: headerFields)
         return (response, body)
     }
 
@@ -257,58 +218,35 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
     /// Makes the underlying HTTP call.
     private func invokeSession(with request: Request) async throws -> Response {
-        try await requestSender.send(
-            request: request,
-            with: configuration.client,
-            timeout: configuration.timeout
-        )
+        try await requestSender.send(request: request, with: configuration.client, timeout: configuration.timeout)
     }
 }
 
 extension HTTPTypes.HTTPRequest.Method {
     var asHTTPMethod: NIOHTTP1.HTTPMethod {
         switch self {
-        case .get:
-            return .GET
-        case .put:
-            return .PUT
-        case .post:
-            return .POST
-        case .delete:
-            return .DELETE
-        case .options:
-            return .OPTIONS
-        case .head:
-            return .HEAD
-        case .patch:
-            return .PATCH
-        case .trace:
-            return .TRACE
-        default:
-            return .RAW(value: rawValue)
+        case .get: return .GET
+        case .put: return .PUT
+        case .post: return .POST
+        case .delete: return .DELETE
+        case .options: return .OPTIONS
+        case .head: return .HEAD
+        case .patch: return .PATCH
+        case .trace: return .TRACE
+        default: return .RAW(value: rawValue)
         }
     }
 }
 
 /// A type that performs HTTP operations using the HTTP client.
 internal protocol HTTPRequestSending: Sendable {
-    func send(
-        request: AsyncHTTPClientTransport.Request,
-        with client: HTTPClient,
-        timeout: TimeAmount
-    ) async throws -> AsyncHTTPClientTransport.Response
+    func send(request: AsyncHTTPClientTransport.Request, with client: HTTPClient, timeout: TimeAmount) async throws
+        -> AsyncHTTPClientTransport.Response
 }
 
 /// Performs HTTP calls using AsyncHTTPClient
 internal struct AsyncHTTPRequestSender: HTTPRequestSending {
-    func send(
-        request: AsyncHTTPClientTransport.Request,
-        with client: AsyncHTTPClient.HTTPClient,
-        timeout: TimeAmount
-    ) async throws -> AsyncHTTPClientTransport.Response {
-        try await client.execute(
-            request,
-            timeout: timeout
-        )
-    }
+    func send(request: AsyncHTTPClientTransport.Request, with client: AsyncHTTPClient.HTTPClient, timeout: TimeAmount)
+        async throws -> AsyncHTTPClientTransport.Response
+    { try await client.execute(request, timeout: timeout) }
 }

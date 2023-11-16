@@ -29,7 +29,7 @@ swiftSettings.append(
 let package = Package(
     name: "swift-openapi-async-http-client",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6),
     ],
     products: [
         .library(

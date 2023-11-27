@@ -181,7 +181,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
             let length: HTTPClientRequest.Body.Length
             switch body.length {
             case .unknown: length = .unknown
-            case .known(let count): length = .known(count)
+            case .known(let count): length = .known(Int(count))
             }
             clientRequest.body = .stream(body.map { .init(bytes: $0) }, length: length)
         }
@@ -197,7 +197,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         for header in httpResponse.headers { headerFields[.init(header.name)!] = header.value }
 
         let length: HTTPBody.Length
-        if let lengthHeaderString = headerFields[.contentLength], let lengthHeader = Int(lengthHeaderString) {
+        if let lengthHeaderString = headerFields[.contentLength], let lengthHeader = Int64(lengthHeaderString) {
             length = .known(lengthHeader)
         } else {
             length = .unknown

@@ -135,7 +135,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
 
     /// Creates a new transport.
     /// - Parameter configuration: A set of configuration values used by the transport.
-    public init(configuration: Configuration) {
+    public init(configuration: Configuration = .init()) {
         self.init(configuration: configuration, requestSender: AsyncHTTPRequestSender())
     }
 

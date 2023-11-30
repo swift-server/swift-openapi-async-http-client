@@ -25,7 +25,7 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
     name: "swift-openapi-async-http-client",
     platforms: [
-        .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6),
+        .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1)
     ],
     products: [
         .library(

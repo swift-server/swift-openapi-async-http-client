@@ -17,7 +17,7 @@ import NIOCore
 import NIOHTTP1
 import NIOFoundationCompat
 import HTTPTypes
-#if canImport(Darwin) || swift(<6.0)
+#if canImport(Darwin) || swift(>=6.0)
 import Foundation
 #else
 @preconcurrency import struct Foundation.URL

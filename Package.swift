@@ -19,7 +19,9 @@ import PackageDescription
 let swiftSettings: [SwiftSetting] = [
     // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     // Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny")
+    .enableUpcomingFeature("ExistentialAny"),
+    // Enable Strict Concurrency Checks for Swift 6 compatibility.
+    .enableExperimentalFeature("StrictConcurrency=complete"),
 ]
 
 let package = Package(

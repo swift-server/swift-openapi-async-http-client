@@ -62,26 +62,27 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         /// The HTTP client used for performing HTTP calls.
         public var client: HTTPClient
 
-        /// The default shared HTTP client.
-        ///
-        /// This is a workaround for the lack of a shared client
-        /// in AsyncHTTPClient. Do not use this value directly, outside of
-        /// the `Configuration.init(client:timeout:)` initializer, as it will
-        /// likely be removed in the future.
-        private static let sharedClient: HTTPClient = .init()
-
         /// The default request timeout.
         public var timeout: TimeAmount
 
         /// Creates a new configuration with the specified client and timeout.
         /// - Parameters:
         ///   - client: The underlying client used to perform HTTP operations.
-        ///     Provide nil to use the shared internal client.
         ///   - timeout: The request timeout, defaults to 1 minute.
-        public init(client: HTTPClient? = nil, timeout: TimeAmount = .minutes(1)) {
-            self.client = client ?? Self.sharedClient
+        public init(client: HTTPClient = .shared, timeout: TimeAmount = .minutes(1)) {
+            self.client = client
             self.timeout = timeout
         }
+
+        /// Creates a new configuration with the specified client and timeout.
+        /// - Parameters:
+        ///   - client: The underlying client used to perform HTTP operations.
+        ///     Provide nil to use the shared client.
+        ///   - timeout: The request timeout, defaults to 1 minute.
+        @available(*, deprecated, renamed: "init(client:timeout:)") @_disfavoredOverload public init(
+            client: HTTPClient? = nil,
+            timeout: TimeAmount = .minutes(1)
+        ) { self.init(client: client ?? .shared, timeout: timeout) }
     }
 
     /// A request to be sent by the transport.
@@ -174,8 +175,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
             let length: HTTPClientRequest.Body.Length
             switch body.length {
             case .unknown: length = .unknown
-            case .known(let count):
-                if let intValue = Int(exactly: count) { length = .known(intValue) } else { length = .unknown }
+            case .known(let count): length = .known(count)
             }
             clientRequest.body = .stream(body.map { .init(bytes: $0) }, length: length)
         }

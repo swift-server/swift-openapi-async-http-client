@@ -130,24 +130,18 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     /// - Parameters:
     ///   - configuration: A set of configuration values used by the transport.
     ///   - requestSender: The underlying request sender closure.
-    @_spi(Benchmarks)
-    public init(
+    @_spi(Benchmarks) public init(
         configuration: Configuration,
-        requestSenderClosure: @Sendable @escaping (HTTPClientRequest, HTTPClient, TimeAmount) async throws -> HTTPClientResponse
+        requestSenderClosure: @Sendable @escaping (HTTPClientRequest, HTTPClient, TimeAmount) async throws ->
+            HTTPClientResponse
     ) {
         struct ClosureRequestSender: HTTPRequestSending {
-            var sendClosure: @Sendable (
-                AsyncHTTPClientTransport.Request,
-                HTTPClient,
-                TimeAmount
-            ) async throws -> AsyncHTTPClientTransport.Response
-            func send(
-                request: AsyncHTTPClientTransport.Request,
-                with client: HTTPClient,
-                timeout: TimeAmount
-            ) async throws -> AsyncHTTPClientTransport.Response {
-                try await sendClosure(request, client, timeout)
-            }
+            var sendClosure:
+                @Sendable (AsyncHTTPClientTransport.Request, HTTPClient, TimeAmount) async throws ->
+                    AsyncHTTPClientTransport.Response
+            func send(request: AsyncHTTPClientTransport.Request, with client: HTTPClient, timeout: TimeAmount)
+                async throws -> AsyncHTTPClientTransport.Response
+            { try await sendClosure(request, client, timeout) }
         }
         self.configuration = configuration
         self.requestSender = ClosureRequestSender(sendClosure: requestSenderClosure)
@@ -201,8 +195,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
             let length: HTTPClientRequest.Body.Length
             switch body.length {
             case .unknown: length = .unknown
-            case .known(let count):
-                if let intValue = Int(exactly: count) { length = .known(intValue) } else { length = .unknown }
+            case .known(let count): length = .known(count)
             }
             clientRequest.body = .stream(body.map { .init(bytes: $0) }, length: length)
         }

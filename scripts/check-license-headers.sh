@@ -43,6 +43,9 @@ read -ra PATHS_TO_CHECK_FOR_LICENSE <<< "$( \
   ":(exclude).gitignore" \
   ":(exclude).spi.yml" \
   ":(exclude).swift-format" \
+  ":(exclude)Benchmarks/.gitignore" \
+  ":(exclude)Benchmarks/Package.swift" \
+  ":(exclude)Benchmarks/README.md" \
   ":(exclude)CODE_OF_CONDUCT.md" \
   ":(exclude)CONTRIBUTING.md" \
   ":(exclude)CONTRIBUTORS.txt" \

@@ -129,7 +129,7 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     /// Creates a new transport.
     /// - Parameters:
     ///   - configuration: A set of configuration values used by the transport.
-    ///   - requestSender: The underlying request sender closure.
+    ///   - requestSenderClosure: The underlying request sender closure.
     @_spi(Benchmarks) public init(
         configuration: Configuration,
         requestSenderClosure: @Sendable @escaping (HTTPClientRequest, HTTPClient, TimeAmount) async throws ->

@@ -79,10 +79,10 @@ public struct AsyncHTTPClientTransport: ClientTransport {
         ///   - client: The underlying client used to perform HTTP operations.
         ///     Provide nil to use the shared client.
         ///   - timeout: The request timeout, defaults to 1 minute.
-        @available(*, deprecated, renamed: "init(client:timeout:)") @_disfavoredOverload public init(
-            client: HTTPClient? = nil,
-            timeout: TimeAmount = .minutes(1)
-        ) { self.init(client: client ?? .shared, timeout: timeout) }
+        @available(*, deprecated, message: "Use the initializer with a non-optional client parameter.")
+        @_disfavoredOverload public init(client: HTTPClient? = nil, timeout: TimeAmount = .minutes(1)) {
+            self.init(client: client ?? .shared, timeout: timeout)
+        }
     }
 
     /// A request to be sent by the transport.

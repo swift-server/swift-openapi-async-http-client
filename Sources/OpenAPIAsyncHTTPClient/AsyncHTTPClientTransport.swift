@@ -128,6 +128,27 @@ public struct AsyncHTTPClientTransport: ClientTransport {
     }
 
     /// Creates a new transport.
+    /// - Parameters:
+    ///   - configuration: A set of configuration values used by the transport.
+    ///   - requestSenderClosure: The underlying request sender closure.
+    @_spi(Benchmarks) public init(
+        configuration: Configuration,
+        requestSenderClosure: @Sendable @escaping (HTTPClientRequest, HTTPClient, TimeAmount) async throws ->
+            HTTPClientResponse
+    ) {
+        struct ClosureRequestSender: HTTPRequestSending {
+            var sendClosure:
+                @Sendable (AsyncHTTPClientTransport.Request, HTTPClient, TimeAmount) async throws ->
+                    AsyncHTTPClientTransport.Response
+            func send(request: AsyncHTTPClientTransport.Request, with client: HTTPClient, timeout: TimeAmount)
+                async throws -> AsyncHTTPClientTransport.Response
+            { try await sendClosure(request, client, timeout) }
+        }
+        self.configuration = configuration
+        self.requestSender = ClosureRequestSender(sendClosure: requestSenderClosure)
+    }
+
+    /// Creates a new transport.
     /// - Parameter configuration: A set of configuration values used by the transport.
     public init(configuration: Configuration = .init()) {
         self.init(configuration: configuration, requestSender: AsyncHTTPRequestSender())

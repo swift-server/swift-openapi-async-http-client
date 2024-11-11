@@ -1,5 +1,5 @@
 version: 1
 builder:
   configs:
-  - documentation_targets:
-    - OpenAPIAsyncHTTPClient
+    - documentation_targets:
+        - OpenAPIAsyncHTTPClient

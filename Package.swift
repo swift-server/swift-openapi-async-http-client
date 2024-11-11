@@ -24,21 +24,13 @@ let swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "swift-openapi-async-http-client",
-    platforms: [
-        .macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1)
-    ],
-    products: [
-        .library(
-            name: "OpenAPIAsyncHTTPClient",
-            targets: ["OpenAPIAsyncHTTPClient"]
-        ),
-    ],
+    platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .visionOS(.v1)],
+    products: [.library(name: "OpenAPIAsyncHTTPClient", targets: ["OpenAPIAsyncHTTPClient"])],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.58.0"),
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.23.0"),
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
     ],
     targets: [
         .target(
@@ -53,9 +45,7 @@ let package = Package(
         ),
         .testTarget(
             name: "OpenAPIAsyncHTTPClientTests",
-            dependencies: [
-                "OpenAPIAsyncHTTPClient",
-            ],
+            dependencies: ["OpenAPIAsyncHTTPClient"],
             swiftSettings: swiftSettings
         ),
     ]

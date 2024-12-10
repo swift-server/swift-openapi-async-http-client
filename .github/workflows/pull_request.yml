@@ -24,3 +24,7 @@ jobs:
   cxx-interop:
     name: Cxx interop
     uses: apple/swift-nio/.github/workflows/cxx_interop.yml@main
+
+  swift-6-language-mode:
+    name: Cxx interop
+    uses: apple/swift-nio/.github/workflows/swift_6_language_mode.yml@main

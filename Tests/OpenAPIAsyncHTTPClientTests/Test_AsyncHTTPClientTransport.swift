@@ -14,6 +14,7 @@
 import XCTest
 import OpenAPIRuntime
 import NIOCore
+import NIOHTTP1
 import NIOPosix
 import AsyncHTTPClient
 @testable import OpenAPIAsyncHTTPClient

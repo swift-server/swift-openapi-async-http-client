@@ -28,3 +28,8 @@ jobs:
   swift-6-language-mode:
     name: Cxx interop
     uses: apple/swift-nio/.github/workflows/swift_6_language_mode.yml@main
+
+  static-sdk:
+    name: Static SDK
+    # Workaround https://github.com/nektos/act/issues/1875
+    uses: apple/swift-nio/.github/workflows/static_sdk.yml@main

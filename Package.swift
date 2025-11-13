@@ -1,4 +1,4 @@
-// swift-tools-version:5.10
+// swift-tools-version:6.0
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftOpenAPIGenerator open source project
@@ -20,7 +20,6 @@ let swiftSettings: [SwiftSetting] = [
     // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     // Require `any` for existential types.
     .enableUpcomingFeature("ExistentialAny"),
-    .enableExperimentalFeature("StrictConcurrency=complete"),
 ]
 
 let package = Package(

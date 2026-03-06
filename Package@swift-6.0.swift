@@ -1,4 +1,4 @@
-// swift-tools-version:6.1
+// swift-tools-version:6.0
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftOpenAPIGenerator open source project
@@ -19,7 +19,7 @@ import PackageDescription
 let swiftSettings: [SwiftSetting] = [
     // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     // Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny"),
+    .enableUpcomingFeature("ExistentialAny")
 ]
 
 let package = Package(
@@ -29,7 +29,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.58.0"),
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.23.0"),
-        .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0", traits: []),
+        .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
     ],
     targets: [
@@ -61,5 +61,4 @@ for target in package.targets {
     case .macro, .plugin, .system, .binary: ()  // not applicable
     @unknown default: ()  // we don't know what to do here, do nothing
     }
-}
-// --- END: STANDARD CROSS-REPO SETTINGS DO NOT EDIT --- //
+}// --- END: STANDARD CROSS-REPO SETTINGS DO NOT EDIT --- //

@@ -15,15 +15,14 @@ import OpenAPIRuntime
 import AsyncHTTPClient
 import NIOCore
 import NIOHTTP1
-import NIOFoundationCompat
 import HTTPTypes
-#if canImport(Darwin)
-import Foundation
+#if canImport(FoundationEssentials)
+@preconcurrency import struct FoundationEssentials.URL
+import struct FoundationEssentials.URLComponents
+import struct FoundationEssentials.Data
+import protocol FoundationEssentials.LocalizedError
 #else
-@preconcurrency import struct Foundation.URL
-import struct Foundation.URLComponents
-import struct Foundation.Data
-import protocol Foundation.LocalizedError
+import Foundation
 #endif
 
 /// A client transport that performs HTTP operations using the HTTPClient type
